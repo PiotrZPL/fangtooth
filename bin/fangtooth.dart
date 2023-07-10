@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:fangtooth/fangtooth.dart' as fangtooth;
+import 'package:fangtooth/functions/validation/is_file_path_valid.dart';
 
 import 'dart:io';
 
@@ -67,6 +68,21 @@ void main() async {
               if (request.headers["directory_path"] != null) {
                 String directoryPath = "${dataDirectory.path}/$userName${request.headers["directory_path"]!}";
                 result = await fangtooth.createUserFolder(directoryPath: directoryPath);
+              }
+            }
+
+            if (request.headers["action"] == "upload_file" && request.method == "PUT") {
+              String? filePath = request.headers["file_path"];
+              if (filePath != null) {
+                if (isFilePathValid(filePath: filePath)) {
+                  File destFile = File("$dataDirectoryPath/$userName$filePath");
+                  List<int> content = [];
+                  await for (List<int> numbers in request.read()) {
+                    content += numbers;
+                  }
+                  destFile.writeAsBytes(content);
+                  result = true;
+                }
               }
             }
             

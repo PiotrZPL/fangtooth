@@ -4,3 +4,5 @@
 
 bin/data/
 bin/conf.yaml
+
+build/
